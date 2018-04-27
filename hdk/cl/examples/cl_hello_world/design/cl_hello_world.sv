@@ -49,6 +49,7 @@ logic rst_main_n_sync;
 // Wires
 //-------------------------------------------------
   logic        arvalid_q;
+  logic [31:0] x,y,z;
   logic [31:0] araddr_q;
   logic [31:0] hello_world_q_byte_swapped;
   logic [15:0] vled_q;
@@ -258,6 +259,7 @@ always_ff @(posedge clk_main_a0)
       rvalid <= 1;
       rdata  <= (araddr_q == `HELLO_WORLD_REG_ADDR) ? hello_world_q_byte_swapped[31:0]:
                 (araddr_q == `VLED_REG_ADDR       ) ? {16'b0,vled_q[15:0]            }:
+		(araddr_q ==  `Z_REG_ADDR ) ? z[31:0]:
                                                       `UNIMPLEMENTED_REG_VALUE        ;
       rresp  <= 0;
    end
@@ -280,6 +282,31 @@ always_ff @(posedge clk_main_a0)
 
 assign hello_world_q_byte_swapped[31:0] = {hello_world_q[7:0],   hello_world_q[15:8],
                                            hello_world_q[23:16], hello_world_q[31:24]};
+
+always_ff @(posedge clk_main_a0)
+   if (!rst_main_n_sync) begin                    // Reset
+      x[31:0] <= 32'h0000_0000;
+   end
+   else if (wready & (wr_addr == `X_REG_ADDR)) begin  
+      x[31:0] <= wdata[31:0];
+   end
+   else begin                                // Hold Value
+     x[31:0] <= x[31:0];
+   end
+
+always_ff @(posedge clk_main_a0)
+   if (!rst_main_n_sync) begin                    // Reset
+      y[31:0] <= 32'h0000_0000;
+   end
+   else if (wready & (wr_addr == `Y_REG_ADDR)) begin  
+      y[31:0] <= wdata[31:0];
+   end
+   else begin                                // Hold Value
+     y[31:0] <= y[31:0];
+   end
+
+assign z = x+y;
+
 
 //-------------------------------------------------
 // Virtual LED Register
