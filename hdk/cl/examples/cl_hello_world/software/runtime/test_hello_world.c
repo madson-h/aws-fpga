@@ -256,9 +256,7 @@ int peek_poke_example(uint32_t value, int slot_id, int pf_id, int bar_id) {
         printf("TEST FAILED");
         printf("Resulting value did not match expected value 0x%x. Something didn't work.\n", expected);
     }
-out:
-    /* clean up */
-uint32_t x,y;
+   uint32_t x,y;
 
     x=2;
 
@@ -309,6 +307,8 @@ uint32_t x,y;
         printf("Resulting value did not match expected value 0x%x. Something didn't work.\n", expected);  
 
   }
+out:
+    /* clean up */
    if (pci_bar_handle >= 0) {
         rc = fpga_pci_detach(pci_bar_handle);
         if (rc) {
